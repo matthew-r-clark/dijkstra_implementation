@@ -28,6 +28,7 @@ let potentialNeighborPositions = [
 let Graph = {
   nodes: {},
   size: undefined,
+  success: false,
 
   generateGrid: function() {
     this.$grid.empty();
@@ -122,14 +123,16 @@ let Graph = {
   solve: function() {
     this.hideResultMessage();
     this.generateNeighborLists();
-    try {
-      this.findPath();
-      this.showPath();
+
+    this.findPath();
+    this.showPath();
+
+    if (this.success) {
       this.displaySuccessMessage();
-    } catch (e) {
+    } else {
       this.displayFailMessage();
-      console.log(e);
     }
+    
     this.unbindClickEventOnBoxes();
   },
 
@@ -227,7 +230,7 @@ let Graph = {
     if (previousNode) {
       this.backtraceRoute(previousNode);
     } else {
-      return;
+      this.success = node.isStart();
     }
   },
 
