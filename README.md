@@ -6,4 +6,5 @@ Before clicking the button to have Matt find his way home, you can toggle the tr
 You can also choose one of three grid sizes.
 
 # Improvements
-Currently the algorithm will look at all nodes even if the there is clearly no complete path from the start to the end. The algorithm could be improved by stopping the process earlier on a failed attempt.
+- Currently the algorithm will look at all nodes even if the there is clearly no complete path from start node to end node. The algorithm could be improved by stopping the process earlier on a failed attempt.
+- Add functionality to reposition start and end nodes.
