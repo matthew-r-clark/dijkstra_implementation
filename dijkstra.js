@@ -48,22 +48,16 @@ let Graph = {
     }
   },
 
-  createNode: function(x, y, htmlElement) {
-    let nodeName = `${x}:${y}`;
-    let node = new Node(x, y, htmlElement);
-    this.nodes[nodeName] = node;
-  },
-
-  generateRandomTree: function($element) {
-    if (Math.random() > 0.7) {
-      $element.toggleClass('tree');
-    }
-  },
-
   setCssGridSize: function(size) {
     let pixelWidth = this.calculateGridWidth(size);
     this.$grid.css('width', pixelWidth);
     this.$grid.css('grid-template-columns', `repeat(${size}, 1fr)`)
+  },
+
+  createNode: function(x, y, htmlElement) {
+    let nodeName = `${x}:${y}`;
+    let node = new Node(x, y, htmlElement);
+    this.nodes[nodeName] = node;
   },
 
   calculateGridWidth: function(size) {
@@ -86,24 +80,10 @@ let Graph = {
     }
   },
 
-  generateNeighborLists: function() {
-    for (let nodeName in this.nodes) {
-      let node = this.nodes[nodeName];
-      node.emptyNeighbors();
-      potentialNeighborPositions.forEach(neighborPosition => {
-        let x = neighborPosition.x + node.x;
-        let y = neighborPosition.y + node.y;
-        let neighbor = this.findNodeAtPosition(x, y);
-        if (neighbor && !neighbor.isTree()) {
-          node.addNeighbor(neighbor);
-        }
-      });
+  generateRandomTree: function($element) {
+    if (Math.random() > 0.7) {
+      $element.toggleClass('tree');
     }
-  },
-
-  findNodeAtPosition: function(x, y) {
-    let nodeName = `${x}:${y}`;
-    return this.nodes[nodeName];
   },
 
   solve: function() {
@@ -122,6 +102,21 @@ let Graph = {
     this.unbindToggleTrees();
   },
 
+  generateNeighborLists: function() {
+    for (let nodeName in this.nodes) {
+      let node = this.nodes[nodeName];
+      node.emptyNeighbors();
+      potentialNeighborPositions.forEach(neighborPosition => {
+        let x = neighborPosition.x + node.x;
+        let y = neighborPosition.y + node.y;
+        let neighbor = this.findNodeAtPosition(x, y);
+        if (neighbor && !neighbor.isTree()) {
+          node.addNeighbor(neighbor);
+        }
+      });
+    }
+  },
+
   findPath: function() {
     this.path = [];
     this.setStartNodeCostToZero();
@@ -135,6 +130,17 @@ let Graph = {
 
     let finish = this.getFinishNode();
     this.backtraceRoute(finish);
+  },
+
+  backtraceRoute: function(node) {
+    this.path.unshift(node);
+    let previousNode = node.getPreviousNode();
+
+    if (previousNode) {
+      this.backtraceRoute(previousNode);
+    } else {
+      this.success = node.isStart();
+    }
   },
 
   showPath: function() {
@@ -158,17 +164,19 @@ let Graph = {
     }, pause - 400);
   },
 
-  displaySuccessMessage: function() {
-    let moves = this.path.length - 1;
-    $('#message').text(`Matt only needed ${moves} moves to get home!`);
+  findNodeAtPosition: function(x, y) {
+    let nodeName = `${x}:${y}`;
+    return this.nodes[nodeName];
   },
 
-  displayFailMessage: function() {
-    $('#message').text('Matt was unable to get home :(');
-  },
-
-  hideResultMessage: function() {
-    $('#message').text('');
+  setStartNodeCostToZero: function() {
+    for (let nodeName in this.nodes) {
+      let node = this.nodes[nodeName];
+      if (node.isStart()) {
+        node.cost = 0;
+        return;
+      }
+    }
   },
 
   getNodesArray: function() {
@@ -194,11 +202,6 @@ let Graph = {
     });
   },
 
-  removeNodeFromArray: function(node, array) {
-    let i = array.indexOf(node);
-    array.splice(i, 1);
-  },
-
   processNodeNeighbors: function(node) {
     node.neighbors.forEach(neighbor => {
       let cost = this.evaluateCost(node, neighbor) + node.cost;
@@ -209,14 +212,17 @@ let Graph = {
     });
   },
 
-  backtraceRoute: function(node) {
-    this.path.unshift(node);
-    let previousNode = node.getPreviousNode();
+  removeNodeFromArray: function(node, array) {
+    let i = array.indexOf(node);
+    array.splice(i, 1);
+  },
 
-    if (previousNode) {
-      this.backtraceRoute(previousNode);
-    } else {
-      this.success = node.isStart();
+  getFinishNode: function() {
+    for (let nodeName in this.nodes) {
+      let node = this.nodes[nodeName];
+      if (node.isFinish()) {
+        return node;
+      }
     }
   },
 
@@ -231,34 +237,12 @@ let Graph = {
     }
   },
 
-  setStartNodeCostToZero: function() {
-    for (let nodeName in this.nodes) {
-      let node = this.nodes[nodeName];
-      if (node.isStart()) {
-        node.cost = 0;
-        return;
-      }
-    }
-  },
-
-  getFinishNode: function() {
-    for (let nodeName in this.nodes) {
-      let node = this.nodes[nodeName];
-      if (node.isFinish()) {
-        return node;
-      }
-    }
-  },
-
   bindDynamicEvents: function() {
     $('.box').click(this.toggleTrees);
     $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
-    $('body').mousemove(this.moveMatt.bind(this));
-    $('.box').mouseup(this.placeMatt.bind(this));
-  },
-
-  unbindToggleTrees: function() {
-    $('.box').off();
+    $('.home').mousedown(this.removeHomeFromCurrentBox.bind(this));
+    $('body').mousemove(this.moveSprite.bind(this));
+    $('.box').mouseup(this.placeSprite.bind(this));
   },
 
   toggleTrees: function(event) {
@@ -268,34 +252,72 @@ let Graph = {
     }
   },
 
+  unbindToggleTrees: function() {
+    $('.box').off();
+  },
+
   removeMattFromCurrentBox: function(event) {
-    this.mousedown = true;
+    this.mousedownMatt = true;
     let $matt = $(event.target);
     $matt.off('mousedown');
     $matt.removeClass('matt');
   },
 
-  moveMatt: function(event) {
-    if (this.mousedown) {
+  removeHomeFromCurrentBox: function(event) {
+    this.mousedownHome = true;
+    let $home = $(event.target);
+    $home.off('mousedown');
+    $home.removeClass('home');
+  },
+
+  moveSprite: function(event) {
+    if (this.mousedownMatt || this.mousedownHome) {
       let $cursor = $('#cursor');
-      $cursor.toggle(true).addClass('matt');
+      $cursor.toggle(true);
       $cursor.css({
         "left": String(event.clientX - 12.5) + 'px',
         "top": String(event.clientY - 12.5) + 'px',
       });
+
+      if (this.mousedownMatt) {
+        $cursor.addClass('matt');
+      } else {
+        $cursor.addClass('home');
+      }
     }
   },
 
-  placeMatt: function(event) {
-    if (this.mousedown) {
+  placeSprite: function(event) {
+    if (this.mousedownMatt || this.mousedownHome) {
       let $cursor = $('#cursor');
-      $cursor.toggle(false).removeClass('matt');
-
+      $cursor.toggle(false);
       let $box = $(event.target);
-      $box.removeClass('tree').addClass('matt');
-      this.mousedown = false;
-      $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
+
+      if (this.mousedownMatt) {
+        $cursor.removeClass('matt');
+        $box.removeClass('tree').addClass('matt');
+        this.mousedownMatt = false;
+        $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
+      } else {
+        $cursor.removeClass('home');
+        $box.removeClass('tree').addClass('home');
+        this.mousedownHome = false;
+        $('.home').mousedown(this.removeHomeFromCurrentBox.bind(this));
+      }
     }
+  },
+
+  displaySuccessMessage: function() {
+    let moves = this.path.length - 1;
+    $('#message').text(`Matt only needed ${moves} moves to get home!`);
+  },
+
+  displayFailMessage: function() {
+    $('#message').text('Matt was unable to get home :(');
+  },
+
+  hideResultMessage: function() {
+    $('#message').text('');
   },
 
   reset: function() {
