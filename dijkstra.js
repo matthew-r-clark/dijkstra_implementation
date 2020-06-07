@@ -120,14 +120,14 @@ let Graph = {
   },
 
   solve: function() {
-    this.hideFail();
+    this.hideResultMessage();
     this.generateNeighborLists();
     try {
       this.findPath();
       this.showPath();
-      this.displaySuccess();
+      this.displaySuccessMessage();
     } catch (e) {
-      this.displayFail();
+      this.displayFailMessage();
       console.log(e);
     }
     this.unbindClickEventOnBoxes();
@@ -149,7 +149,7 @@ let Graph = {
   },
 
   showPath: function() {
-    let pause = 500;
+    let pause = 400;
     this.path.forEach((node, index, nodes) => {
       setTimeout(function () {
         node.$element.removeClass('matt');
@@ -160,25 +160,25 @@ let Graph = {
           nextNode.$element.addClass('matt');
         }
       }, pause);
-      pause += 500;
+      pause += 400;
     });
     
     let finishNode = this.getFinishNode();
     setTimeout(function() {
       finishNode.$element.removeClass('visited');
-    }, pause - 500);
+    }, pause - 400);
   },
 
-  displaySuccess: function() {
+  displaySuccessMessage: function() {
     let moves = this.path.length - 1;
     $('#message').text(`Matt only needed ${moves} moves to get home!`);
   },
 
-  displayFail: function() {
+  displayFailMessage: function() {
     $('#message').text('Matt was unable to get home :(');
   },
 
-  hideFail: function() {
+  hideResultMessage: function() {
     $('#message').text('');
   },
 
@@ -222,12 +222,13 @@ let Graph = {
 
   backtraceRoute: function(node) {
     this.path.unshift(node);
+    let previousNode = node.getPreviousNode();
 
-    if (node.isStart()) {
+    if (previousNode) {
+      this.backtraceRoute(previousNode);
+    } else {
       return;
     }
-
-    this.backtraceRoute(node.getPreviousNode());
   },
 
   evaluateCost: function(node, neighbor) {
@@ -261,7 +262,7 @@ let Graph = {
   },
 
   reset: function() {
-    this.hideFail();
+    this.hideResultMessage();
     this.generateGrid();
     this.generateSprites();
   },
