@@ -29,7 +29,6 @@ p {
 }
 
 .box {
-  box-sizing: border-box;
   height: 25px;
   width: 25px;
   margin: 1px;
@@ -70,10 +69,11 @@ p {
 
 .visited {
   background-color: rgb(36, 36, 36);
-  width: 5px;
-  height: 5px;
-  border-radius: 5px;
+  height: 10px;
+  width: 10px;
+  border-radius: 10px;
   margin: auto;
+  border: none;
 }
 
 #solve, #reload {

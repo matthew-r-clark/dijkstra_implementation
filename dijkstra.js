@@ -125,6 +125,7 @@ let Graph = {
     try {
       this.findPath();
       this.showPath();
+      this.displaySuccess();
     } catch (e) {
       this.displayFail();
       console.log(e);
@@ -168,12 +169,17 @@ let Graph = {
     }, pause - 500);
   },
 
+  displaySuccess: function() {
+    let moves = this.path.length - 1;
+    $('#message').text(`Matt only needed ${moves} moves to get home!`);
+  },
+
   displayFail: function() {
-    $('#failure').text('Matt was unable to get home :(');
+    $('#message').text('Matt was unable to get home :(');
   },
 
   hideFail: function() {
-    $('#failure').text('');
+    $('#message').text('');
   },
 
   getNodesArray: function() {
