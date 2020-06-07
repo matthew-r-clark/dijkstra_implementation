@@ -1,6 +1,10 @@
 body {
   background-color: lightgray;
   color: rgb(36, 36, 36);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
 }
 
 h1 {
@@ -13,8 +17,8 @@ select {
   border-radius: 2px;
 }
 
-p, footer {
-  text-align: center;
+footer {
+  margin-bottom: 25px;
 }
 
 #grid-size-chooser {
