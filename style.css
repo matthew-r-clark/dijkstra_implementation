@@ -99,3 +99,15 @@ p, footer {
   background-color: rgb(136, 204, 33);
   cursor: pointer;
 }
+
+#cursor {
+  height: 25px;
+  width: 25px;
+  display: none;
+  margin: none;
+  background-color: transparent;
+  border-radius: 0px;
+  border: none;
+  position: absolute;
+  pointer-events: none;
+}

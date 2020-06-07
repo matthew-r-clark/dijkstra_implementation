@@ -35,7 +35,6 @@ let Graph = {
     this.size = Number(this.$gridSize.val());
     this.createBoxesAndNodes(this.size);
     this.setCssGridSize(this.size);
-    this.bindClickEventOnBoxes();
   },
 
   createBoxesAndNodes: function(size) {
@@ -65,19 +64,6 @@ let Graph = {
     let pixelWidth = this.calculateGridWidth(size);
     this.$grid.css('width', pixelWidth);
     this.$grid.css('grid-template-columns', `repeat(${size}, 1fr)`)
-  },
-
-  bindClickEventOnBoxes: function() {
-    let $boxes = $('.box');
-    $boxes.click(function(event) {
-      let $box = $(event.target);
-      $box.toggleClass('tree');
-    });
-  },
-
-  unbindClickEventOnBoxes: function() {
-    let $boxes = $('.box');
-    $boxes.off();
   },
 
   calculateGridWidth: function(size) {
@@ -133,7 +119,7 @@ let Graph = {
       this.displayFailMessage();
     }
 
-    this.unbindClickEventOnBoxes();
+    this.unbindToggleTrees();
   },
 
   findPath: function() {
@@ -264,10 +250,59 @@ let Graph = {
     }
   },
 
+  bindDynamicEvents: function() {
+    $('.box').click(this.toggleTrees);
+    $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
+    $('body').mousemove(this.moveMatt.bind(this));
+    $('.box').mouseup(this.placeMatt.bind(this));
+  },
+
+  unbindToggleTrees: function() {
+    $('.box').off();
+  },
+
+  toggleTrees: function(event) {
+    let $box = $(event.target);
+    if (!$box.hasClass('matt') && !$box.hasClass('home')) {
+      $box.toggleClass('tree');
+    }
+  },
+
+  removeMattFromCurrentBox: function(event) {
+    this.mousedown = true;
+    let $matt = $(event.target);
+    $matt.off('mousedown');
+    $matt.removeClass('matt');
+  },
+
+  moveMatt: function(event) {
+    if (this.mousedown) {
+      let $cursor = $('#cursor');
+      $cursor.toggle(true).addClass('matt');
+      $cursor.css({
+        "left": String(event.clientX - 12.5) + 'px',
+        "top": String(event.clientY - 12.5) + 'px',
+      });
+    }
+  },
+
+  placeMatt: function(event) {
+    if (this.mousedown) {
+      let $cursor = $('#cursor');
+      $cursor.toggle(false).removeClass('matt');
+
+      let $box = $(event.target);
+      $box.removeClass('tree').addClass('matt');
+      this.mousedown = false;
+      $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
+    }
+  },
+
   reset: function() {
     this.hideResultMessage();
     this.generateGrid();
     this.generateSprites();
+    this.bindDynamicEvents();
   },
 
   bindElements: function() {
