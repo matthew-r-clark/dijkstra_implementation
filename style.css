@@ -10,6 +10,11 @@ h1 {
 
 select {
   background-color: lightgray;
+  border-radius: 2px;
+}
+
+p {
+  text-align: center;
 }
 
 #grid-size-chooser {
@@ -20,7 +25,7 @@ select {
 #grid {
   display: grid;
   grid-auto-rows: auto;
-  margin: auto;
+  margin: 15px auto;
 }
 
 .box {
@@ -34,7 +39,9 @@ select {
 }
 
 .box:hover {
+  background-color: darkgray;
   border: 1px solid rgb(36, 36, 36);
+  cursor: pointer;
 }
 
 .tree {
@@ -55,10 +62,33 @@ select {
   border: none;
 }
 
+.matt:hover, .home:hover {
+  background-color: lightgray;
+  border: none;
+  cursor: default;
+}
+
 .visited {
   background-color: rgb(36, 36, 36);
   width: 5px;
   height: 5px;
   border-radius: 5px;
   margin: auto;
+}
+
+#solve, #reload {
+  width: 150px;
+  text-align: center;
+  margin: auto;
+  margin-bottom: 5px;
+  padding: 5px;
+  border: 1px solid darkgray;
+  background-color: greenyellow;
+  border-radius: 5px;
+}
+
+#solve:hover, #reload:hover {
+  border: 1px solid rgb(36, 36, 36);
+  background-color: rgb(136, 204, 33);
+  cursor: pointer;
 }
