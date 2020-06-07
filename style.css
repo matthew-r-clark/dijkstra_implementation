@@ -76,8 +76,15 @@ p {
   border: none;
 }
 
+#buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 290px;
+  margin: auto;
+}
+
 #solve, #reload {
-  width: 150px;
   text-align: center;
   margin: auto;
   margin-bottom: 5px;
