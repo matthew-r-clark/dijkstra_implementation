@@ -125,14 +125,14 @@ let Graph = {
     this.generateNeighborLists();
 
     this.findPath();
-    this.showPath();
 
     if (this.success) {
+      this.showPath();
       this.displaySuccessMessage();
     } else {
       this.displayFailMessage();
     }
-    
+
     this.unbindClickEventOnBoxes();
   },
 
