@@ -7,6 +7,8 @@ You can also choose one of three grid sizes.
 
 Both start (Matt) and end (home) nodes can be moved by dragging and dropping onto another square.
 
+Watch a [demo](https://youtu.be/skIDMW3XNm4).
+
 # Improvements
 - Currently the algorithm will look at all nodes even if the there is clearly no complete path from start node to end node. The algorithm could be improved by stopping the process earlier on a failed attempt.
 - Small bug when dragging and dropping start/end sprites: works fine the first time you move the sprite, but every other movement of the same sprite will freeze within the current box as long as the mouse button is down. When the mouse button is released, you can move the sprite to another box and place it by clicking again.
