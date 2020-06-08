@@ -12,4 +12,3 @@ Watch a [demo](https://youtu.be/skIDMW3XNm4).
 # Improvements
 - Currently the algorithm will look at all nodes even if the there is clearly no complete path from start node to end node. The algorithm could be improved by stopping the process earlier on a failed attempt.
 - Small bug when dragging and dropping start/end sprites: works fine the first time you move the sprite, but every other movement of the same sprite will freeze within the current box as long as the mouse button is down. When the mouse button is released, you can move the sprite to another box and place it by clicking again.
-- Fails on 15x15 when a clear route is possible. logs nodes for a 20x20 grid, even though the path logged appears to be for a 15x15, but it is not the correct path. Confirmed by other testing, it appears the nodes list is not being reset when a new grid is generated.

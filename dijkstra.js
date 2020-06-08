@@ -1,5 +1,6 @@
 const BOX_SIZE = 25;
 const BOX_MARGIN = 1;
+const LOGGING_ENABLED = true;
 
 $(function() {
   let graph = Object.create(Graph);
@@ -38,6 +39,7 @@ let Graph = {
   },
 
   createBoxesAndNodes: function(size) {
+    this.purgeNodes();
     for (let y = 1; y <= size; y += 1) {
       for (let x = 1; x <= size; x += 1) {
         let $box = $(document.createElement('div'));
@@ -46,6 +48,10 @@ let Graph = {
         this.createNode(x, y, $box);
       }
     }
+  },
+
+  purgeNodes: function() {
+    this.nodes = {};
   },
 
   setCssGridSize: function(size) {
@@ -89,16 +95,9 @@ let Graph = {
   solve: function() {
     this.hideResultMessage();
     this.generateNeighborLists();
-
     this.findPath();
-
-    if (this.success) {
-      this.showPath();
-      this.displaySuccessMessage();
-    } else {
-      this.displayFailMessage();
-    }
-
+    this.handleSuccessOrFail();
+    this.debuggingLog();
     this.unbindToggleTrees();
   },
 
@@ -130,6 +129,22 @@ let Graph = {
 
     let finish = this.getFinishNode();
     this.backtraceRoute(finish);
+  },
+
+  handleSuccessOrFail: function() {
+    if (this.success) {
+      this.showPath();
+      this.displaySuccessMessage();
+    } else {
+      this.displayFailMessage();
+    }
+  },
+
+  debuggingLog: function() {
+    if (LOGGING_ENABLED) {
+      console.log('Path:', this.path);
+      console.log('Nodes:', this.nodes);
+    }
   },
 
   backtraceRoute: function(node) {
