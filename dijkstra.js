@@ -93,12 +93,17 @@ let Graph = {
   },
 
   solve: function() {
+    this.hideSolveButton();
     this.hideResultMessage();
     this.generateNeighborLists();
     this.findPath();
     this.handleSuccessOrFail();
     this.debuggingLog();
     this.unbindToggleTrees();
+  },
+
+  hideSolveButton: function() {
+    $('#solve').toggle(false);
   },
 
   generateNeighborLists: function() {
@@ -336,10 +341,15 @@ let Graph = {
   },
 
   reset: function() {
+    this.showSolveButton();
     this.hideResultMessage();
     this.generateGrid();
     this.generateSprites();
     this.bindDynamicEvents();
+  },
+
+  showSolveButton: function () {
+    $('#solve').toggle(true);
   },
 
   bindElements: function() {
