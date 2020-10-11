@@ -1,6 +1,6 @@
 const BOX_SIZE = 25;
 const BOX_MARGIN = 1;
-const LOGGING_ENABLED = true;
+let loggingEnabled = false;
 
 $(function() {
   let graph = Object.create(Graph);
@@ -146,7 +146,7 @@ let Graph = {
   },
 
   debuggingLog: function() {
-    if (LOGGING_ENABLED) {
+    if (loggingEnabled) {
       console.log('Path:', this.path);
       console.log('Nodes:', this.nodes);
     }
