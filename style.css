@@ -1,5 +1,5 @@
 body {
-  background-color: lightgray;
+  background-color: white;
   color: rgb(36, 36, 36);
   display: flex;
   flex-direction: column;
@@ -13,7 +13,7 @@ h1 {
 }
 
 select {
-  background-color: lightgray;
+  background-color: white;
   border-radius: 2px;
 }
 
@@ -49,25 +49,25 @@ footer {
 }
 
 .tree {
-  background-color: lightgray;
+  background-color: white;
   background-image: url("./images/tree.png");
   border: none;
 }
 
 .matt {
-  background-color: lightgray;
+  background-color: white;
   background-image: url("./images/matt.png");
   border: none;
 }
 
 .home {
-  background-color: lightgray;
+  background-color: white;
   background-image: url("./images/home.png");
   border: none;
 }
 
 .matt:hover, .home:hover {
-  background-color: lightgray;
+  background-color: white;
   border: none;
   cursor: default;
 }
