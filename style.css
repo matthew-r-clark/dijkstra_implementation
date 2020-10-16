@@ -19,7 +19,7 @@ select {
 
 footer {
   margin-bottom: 10px;
-  color: darkgray;
+  color: rgb(80, 80, 80);
 }
 
 #grid-size-chooser {
