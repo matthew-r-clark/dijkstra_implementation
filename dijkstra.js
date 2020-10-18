@@ -104,7 +104,7 @@ let Graph = {
     this.findPath();
     this.handleSuccessOrFail();
     this.debuggingLog();
-    this.unbindToggleTrees();
+    this.unbindDynamicEvents();
   },
 
   hideSolveButton: function() {
@@ -265,12 +265,18 @@ let Graph = {
   },
 
   bindDynamicEvents: function() {
-    $('#grid').click(this.toggleTrees);
+    this.$grid.click(this.toggleTrees);
     $('.matt').mousedown(this.handleMousedownOnMatt.bind(this));
     $('.home').mousedown(this.handleMousedownOnHome.bind(this));
-    $('body').mousemove(this.handleMousemove.bind(this));
-    $('#grid').mouseup(this.handleMouseupOnGrid.bind(this));
-    $('body').mouseup(this.handleMouseupOffGrid.bind(this));
+    $(document.body).mousemove(this.handleMousemove.bind(this));
+    this.$grid.mouseup(this.handleMouseupOnGrid.bind(this));
+    $(document.body).mouseup(this.handleMouseupOffGrid.bind(this));
+  },
+
+  unbindDynamicEvents: function() {
+    this.$grid.off();
+    $(document.body).off();
+    $('.box').off();
   },
 
   toggleTrees: function(event) {
@@ -278,10 +284,6 @@ let Graph = {
     if ($box.hasClass('box') && !$box.hasClass('matt') && !$box.hasClass('home')) {
       $box.toggleClass('tree');
     }
-  },
-
-  unbindToggleTrees: function() {
-    $('.box').off();
   },
 
   handleMousedownOnMatt: function(event) {
