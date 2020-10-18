@@ -265,23 +265,22 @@ let Graph = {
   },
 
   bindDynamicEvents: function() {
-    this.$grid.click(this.toggleTrees);
+    $('.box').click(this.toggleTrees);
     $('.matt').mousedown(this.handleMousedownOnMatt.bind(this));
     $('.home').mousedown(this.handleMousedownOnHome.bind(this));
     $(document.body).mousemove(this.handleMousemove.bind(this));
-    this.$grid.mouseup(this.handleMouseupOnGrid.bind(this));
+    $('.box').mouseup(this.handleMouseupOnGrid.bind(this));
     $(document.body).mouseup(this.handleMouseupOffGrid.bind(this));
   },
 
   unbindDynamicEvents: function() {
-    this.$grid.off();
-    $(document.body).off();
     $('.box').off();
+    $(document.body).off();
   },
 
   toggleTrees: function(event) {
     let $box = $(event.target);
-    if ($box.hasClass('box') && !$box.hasClass('matt') && !$box.hasClass('home')) {
+    if (!$box.hasClass('matt') && !$box.hasClass('home')) {
       $box.toggleClass('tree');
     }
   },
@@ -343,7 +342,7 @@ let Graph = {
     event.stopPropagation();
     let $target = $(event.target);
     
-    if ($target.hasClass('matt') || $target.hasClass('home') || !$target.hasClass('.box')) {
+    if ($target.hasClass('matt') || $target.hasClass('home')) {
       this.replaceSprite();
     } else if (this.isMousedown()) {
       this.handleSpritePlacement($target);
