@@ -1,6 +1,11 @@
 const BOX_SIZE = 25;
 const BOX_MARGIN = 1;
 let loggingEnabled = false;
+var appState;
+
+function report() {
+  console.log(appState);
+}
 
 $(function() {
   let graph = Object.create(Graph);
@@ -168,7 +173,9 @@ let Graph = {
     this.path.forEach((node, index, nodes) => {
       setTimeout(function () {
         node.$element.removeClass('matt');
-        node.$element.addClass('visited');
+        if (!node.$element.hasClass('home')) {
+          node.$element.addClass('visited');
+        }
 
         let nextNode = nodes[index + 1];
         if (nextNode && !nextNode.$element.hasClass('home')) {
@@ -258,16 +265,17 @@ let Graph = {
   },
 
   bindDynamicEvents: function() {
-    $('.box').click(this.toggleTrees);
-    $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
-    $('.home').mousedown(this.removeHomeFromCurrentBox.bind(this));
-    $('body').mousemove(this.moveSprite.bind(this));
-    $('.box').mouseup(this.placeSprite.bind(this));
+    $('#grid').click(this.toggleTrees);
+    $('.matt').mousedown(this.handleMousedownOnMatt.bind(this));
+    $('.home').mousedown(this.handleMousedownOnHome.bind(this));
+    $('body').mousemove(this.handleMousemove.bind(this));
+    $('#grid').mouseup(this.handleMouseupOnGrid.bind(this));
+    $('body').mouseup(this.handleMouseupOffGrid.bind(this));
   },
 
   toggleTrees: function(event) {
     let $box = $(event.target);
-    if (!$box.hasClass('matt') && !$box.hasClass('home')) {
+    if ($box.hasClass('box') && !$box.hasClass('matt') && !$box.hasClass('home')) {
       $box.toggleClass('tree');
     }
   },
@@ -276,55 +284,119 @@ let Graph = {
     $('.box').off();
   },
 
-  removeMattFromCurrentBox: function(event) {
-    this.mousedownMatt = true;
-    let $matt = $(event.target);
-    $matt.off('mousedown');
-    $matt.removeClass('matt');
+  handleMousedownOnMatt: function(event) {
+    if (!this.mousedownHome) {
+      this.mousedownMatt = true;
+      let $target = $(event.target);
+      $target.off('mousedown');
+      $target.removeClass('matt');
+      this.$previouslyOccupiedByMatt = $target;
+      this.moveSprite(event.clientX, event.clientY);
+    }
   },
 
-  removeHomeFromCurrentBox: function(event) {
-    this.mousedownHome = true;
-    let $home = $(event.target);
-    $home.off('mousedown');
-    $home.removeClass('home');
+  handleMousedownOnHome: function(event) {
+    if (!this.mousedownMatt) {
+      this.mousedownHome = true;
+      let $target = $(event.target);
+      $target.off('mousedown');
+      $target.removeClass('home');
+      this.$previouslyOccupiedByHome = $target;
+      this.moveSprite(event.clientX, event.clientY);
+    }
   },
 
-  moveSprite: function(event) {
-    if (this.mousedownMatt || this.mousedownHome) {
+  handleMousemove: function(event) {
+    this.moveSprite(event.clientX, event.clientY);
+  },
+
+  handleMouseupOnGrid: function(event) {
+    this.placeSprite(event);
+  },
+
+  handleMouseupOffGrid: function(event) {
+    this.replaceSprite(event);
+  },
+
+  moveSprite: function(x, y) {
+    if (this.isMousedown()) {
       let $cursor = $('#cursor');
       $cursor.toggle(true);
       $cursor.css({
-        "left": String(event.clientX - 12.5) + 'px',
-        "top": String(event.clientY - 12.5) + 'px',
+        'left': String(x - 12.5) + 'px',
+        'top': String(y - 12.5) + 'px',
       });
 
       if (this.mousedownMatt) {
-        $cursor.addClass('matt');
+        $cursor.removeClass('home').addClass('matt');
+      } else if (this.mousedownHome) {
+        $cursor.removeClass('matt').addClass('home');
       } else {
-        $cursor.addClass('home');
+        $cursor.removeClass('matt home');
       }
     }
   },
 
   placeSprite: function(event) {
-    if (this.mousedownMatt || this.mousedownHome) {
-      let $cursor = $('#cursor');
-      $cursor.toggle(false);
-      let $box = $(event.target);
+    event.stopPropagation();
+    let $target = $(event.target);
+    
+    if ($target.hasClass('matt') || $target.hasClass('home')) {
+      this.replaceSprite();
+    } else if (this.isMousedown()) {
+      this.handleSpritePlacement($target);
+    }
+  },
 
-      if (this.mousedownMatt) {
-        $cursor.removeClass('matt');
-        $box.removeClass('tree').addClass('matt');
-        this.mousedownMatt = false;
-        $('.matt').mousedown(this.removeMattFromCurrentBox.bind(this));
-      } else {
-        $cursor.removeClass('home');
-        $box.removeClass('tree').addClass('home');
-        this.mousedownHome = false;
-        $('.home').mousedown(this.removeHomeFromCurrentBox.bind(this));
+  replaceSprite: function(event) {
+    let $target;
+    if (event && event.target) {
+      $target = $(event.target);
+    }
+
+    if (!$target || (!$target.hasClass('.box') && (this.isMousedown()))) {
+      let $box;
+      let $cursor = $('#cursor');
+      if ($cursor.hasClass('matt')) {
+        $box = this.$previouslyOccupiedByMatt;
+      } else if ($cursor.hasClass('home')) {
+        $box = this.$previouslyOccupiedByHome;
+      }
+
+      if ($box) {
+        this.handleSpritePlacement($box);
       }
     }
+  },
+
+  handleSpritePlacement: function($box) {
+    this.resetCursor();
+
+    if (this.mousedownMatt) {
+      $box.removeClass('tree').addClass('matt');
+      $('.matt').mousedown(this.handleMousedownOnMatt.bind(this));
+    } else if (this.mousedownHome) {
+      $box.removeClass('tree').addClass('home');
+      $('.home').mousedown(this.handleMousedownOnHome.bind(this));
+    }
+    this.mousedownMatt = false;
+    this.mousedownHome = false;
+    this.$previouslyOccupiedByMatt = undefined;
+    this.$previouslyOccupiedByHome = undefined;
+  },
+
+  isMousedown: function() {
+    return this.mousedownMatt || this.mousedownHome;
+  },
+
+  resetCursor: function() {
+    let $cursor = $('#cursor');
+    $cursor.removeClass('matt home');
+    $cursor.css({
+      'left': '0px',
+      'top': '0px',
+    });
+    $cursor.toggle(false);
   },
 
   displaySuccessMessage: function() {
@@ -362,6 +434,7 @@ let Graph = {
   },
 
   init: function() {
+    appState = this;
     this.bindElements();
     this.bindEvents();
     this.reset();
