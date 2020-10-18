@@ -343,7 +343,7 @@ let Graph = {
     event.stopPropagation();
     let $target = $(event.target);
     
-    if ($target.hasClass('matt') || $target.hasClass('home')) {
+    if ($target.hasClass('matt') || $target.hasClass('home') || !$target.hasClass('.box')) {
       this.replaceSprite();
     } else if (this.isMousedown()) {
       this.handleSpritePlacement($target);
